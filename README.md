@@ -1,52 +1,77 @@
-# Laboratorio 7 — Enrutamiento dinámico y transporte
+# Laboratorio 7 - Enrutamiento dinámico y análisis de transporte
 
 **Autores:** Juan Esteban Ortiz Pastrana y Santiago Alberto Naranjo Abril  
 **Institución:** Escuela Colombiana de Ingeniería Julio Garavito  
 **Grupo:** 2  
 **Fecha:** 18 de noviembre de 2023
 
-## Introducción
+## Objetivo
 
-Routers y switches dirigen el tráfico dentro de una infraestructura. Los routers toman decisiones de enrutamiento con base en las direcciones IP de destino; los switches conectan dispositivos dentro de redes locales.
+Comparar mecanismos de enrutamiento, configurar RIP, EIGRP y OSPF, y analizar tráfico UDP y TCP con Wireshark.
 
 ## Marco teórico
 
-El informe compara:
+| Mecanismo | Característica |
+| --- | --- |
+| Enrutamiento estático | Las rutas se definen manualmente |
+| Enrutamiento dinámico | Los routers actualizan sus tablas según la topología |
+| Vector distancia | Intercambia información con vecinos y calcula distancia |
+| Estado de enlace | Mantiene información de enlaces y calcula la mejor ruta |
 
-- **Enrutamiento estático:** las rutas son configuradas manualmente.
-- **Enrutamiento dinámico:** los routers construyen y actualizan sus tablas según la topología.
-- **Vector distancia:** calcula dirección y distancia y comunica cambios a los vecinos.
-- **Estado de enlace:** mantiene información de la topología y calcula rutas.
+El informe estudia RIP, IGRP, EIGRP y OSPF:
 
-También se estudian RIP, IGRP, EIGRP y OSPF, junto con sus métricas y mecanismos de actualización.
+- **RIP:** utiliza conteo de saltos.
+- **IGRP:** combina ancho de banda, retardo, confiabilidad y carga.
+- **EIGRP:** mejora IGRP y usa valores `K` o pesos.
+- **OSPF:** selecciona rutas mediante costo, relacionado con el ancho de banda.
 
-## Experimentación
+## Topología y subnetting
 
-### RIP y VLSM
+Se partió de la distribución del laboratorio anterior, se asignaron direcciones a las LAN y se conectaron routers mediante enlaces seriales. Antes de habilitar enrutamiento, cada host solo podía alcanzar su red y gateway.
 
-Se realiza subnetting, se asignan direcciones a las LAN y se configuran routers. Mediante Telnet se accede de forma remota a los dispositivos para definir las redes participantes.
+![Topología de enrutamiento y subnetting](assets/topologia-enrutamiento.jpg)
+
+## Experimentos
+
+### RIP con VLSM
+
+Se configuraron redes en los routers y se verificó la comunicación con vecinos. La tabla de enrutamiento permitió diferenciar redes conectadas directamente y rutas aprendidas.
 
 ### EIGRP
 
-La configuración anterior se reemplaza y se habilita EIGRP. Su métrica utiliza valores `K` o pesos que pueden ajustarse.
+Se accedió a los routers mediante Telnet y se reemplazó la configuración anterior:
+
+```text
+no router rip
+router eigrp 1
+network <direccion>
+```
+
+![Configuración remota de EIGRP](assets/configuracion-eigrp.jpg)
 
 ### OSPF
 
-Se elimina la configuración de EIGRP y se habilita OSPF. La selección se basa en el costo, relacionado con el ancho de banda: un mayor ancho de banda produce un costo menor.
+Se liberó la configuración de EIGRP, se inició un proceso OSPF y se declararon vecinos y redes. La ruta preferida corresponde al menor costo; un enlace con mayor ancho de banda produce un costo menor.
 
-## Análisis de transporte
+## Análisis de UDP y TCP
 
-Con Wireshark se capturan y revisan:
+Wireshark se utilizó para revisar:
 
-- **UDP:** puertos de origen y destino, longitud, checksum y tamaño.
-- **TCP:** puertos, número de secuencia, número de reconocimiento y longitud.
+- Puertos de origen y destino.
+- Longitud del mensaje.
+- Checksum.
+- Tamaño del frame.
+- Números de secuencia y reconocimiento en TCP.
+
+![Inspección de un paquete UDP](assets/analisis-udp.jpg)
 
 ## Conclusiones
 
-La experimentación muestra que el algoritmo de enrutamiento puede afectar la velocidad de transmisión y la estabilidad de la red. Por ello es necesario comprender el funcionamiento de cada protocolo y elegir el mecanismo más apropiado según la red.
+La experimentación muestra que el protocolo elegido puede afectar la velocidad y la estabilidad de la red. No existe un único mecanismo adecuado para todos los escenarios: la topología, las métricas y la complejidad de administración determinan cuál resulta más conveniente.
 
-## Contenido del repositorio
+## Informe y archivos
 
-- Informe completo en DOCX y PDF.
-- Topologías DHCP y EIGRP desarrolladas por Santiago Naranjo.
-- Hoja de cálculo de subnetting.
+- [Informe completo en PDF](laboratorio-07-enrutamiento-dinamico.pdf)
+- `Laboratorio7.docx`
+- Topologías DHCP y EIGRP de Santiago Naranjo
+- Hoja de subnetting
